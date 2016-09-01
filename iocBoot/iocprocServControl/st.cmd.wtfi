@@ -1,0 +1,47 @@
+############################################################################
+< envPaths
+
+# For deviocstats
+epicsEnvSet("ENGINEER", "Alireza Panna")
+epicsEnvSet("LOCATION", "B1D521D DT-HPLIN111")
+epicsEnvSet("STARTUP","$(TOP)/iocBoot/$(IOC)")
+epicsEnvSet("ST_CMD","st.cmd.wtfi")
+
+# PVs to be controlled via procServ hosted on port 2xxx
+epicsEnvSet "IOC1" "$(IOC1=IPL:SCAN)"
+epicsEnvSet "IOC2" "$(IOC2=IPL:SRI:xray)"
+epicsEnvSet "IOC3" "$(IOC3=IPL:NEWPORT)"
+############################################################################
+# Increase size of buffer for error logging from default 1256
+errlogInit(20000)
+############################################################################
+# Register all support components
+cd $(TOP)
+dbLoadDatabase "dbd/procServControl.dbd"
+procServControl_registerRecordDeviceDriver(pdbbase)
+############################################################################
+# Set up ASYN ports
+drvAsynIPPortConfigure("port1", "localhost:2000", 100, 0, 0)
+drvAsynIPPortConfigure("port2", "localhost:2001", 100, 0, 0)
+drvAsynIPPortConfigure("port3", "localhost:2002", 100, 0, 0)
+############################################################################
+# Load record instances 
+dbLoadRecords("db/procServControl.db", "P=$(IOC1), PORT=port1, NPORT=2000")
+dbLoadRecords("db/procServControl.db", "P=$(IOC2), PORT=port2, NPORT=2001")
+dbLoadRecords("db/procServControl.db", "P=$(IOC3), PORT=port3, NPORT=2002")
+############################################################################
+# Start EPICS IOC
+cd $(STARTUP)
+iocInit
+############################################################################
+# Write all PV names to local text file.
+dbl > records.txt
+############################################################################
+# startup SNL program procServControl.st for each IOC.
+seq (&procServControl,"P=$(IOC1)")
+seq (&procServControl,"P=$(IOC2)")
+seq (&procServControl,"P=$(IOC3)")
+############################################################################
+# print the time our boot was finished
+date
+############################################################################

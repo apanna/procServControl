@@ -1,0 +1,67 @@
+############################################################################
+< envPaths
+
+# For deviocstats
+epicsEnvSet("ENGINEER", "Alireza Panna")
+epicsEnvSet("LOCATION", "B1D521D DT-SMLIN112")
+epicsEnvSet("STARTUP","$(TOP)/iocBoot/$(IOC)")
+epicsEnvSet("ST_CMD","st.cmd.hpfi")
+
+# PVs to be controlled via procServ hosted on port 2xxx
+epicsEnvSet "IOC1" "$(IOC1=HPFI:SCAN)"
+epicsEnvSet "IOC2" "$(IOC2=HPFI:CPI:xray)"
+epicsEnvSet "IOC3" "$(IOC3=HPFI:KOHZU)"
+epicsEnvSet "IOC4" "$(IOC4=HPFI:NEWPORT)"
+epicsEnvSet "IOC5" "$(IOC5=HPFI)"
+epicsEnvSet "IOC6" "$(IOC6=HPFI:Qi2)"
+#epicsEnvSet "IOC7" "$(IOC7=HPFI:TL)"
+epicsEnvSet "IOC8" "$(IOC8=HPFI:cpiSync)"
+############################################################################
+# Increase size of buffer for error logging from default 1256
+errlogInit(20000)
+############################################################################
+# Register all support components
+cd $(TOP)
+dbLoadDatabase "dbd/procServControl.dbd"
+procServControl_registerRecordDeviceDriver(pdbbase)
+############################################################################
+# Set up ASYN ports
+drvAsynIPPortConfigure("port1", "localhost:2000", 100, 0, 0)
+drvAsynIPPortConfigure("port2", "localhost:2001", 100, 0, 0)
+drvAsynIPPortConfigure("port3", "localhost:2002", 100, 0, 0)
+drvAsynIPPortConfigure("port4", "localhost:2003", 100, 0, 0)
+drvAsynIPPortConfigure("port5", "localhost:2004", 100, 0, 0)
+drvAsynIPPortConfigure("port6", "192.168.1.122:2005", 100, 0, 0)
+drvAsynIPPortConfigure("port7", "192.168.1.122:2006", 100, 0, 0)
+drvAsynIPPortConfigure("port8", "192.168.1.122:2007", 100, 0, 0)
+############################################################################
+# Load record instances 
+dbLoadRecords("db/procServControl.db", "P=$(IOC1), PORT=port1, NPORT=2000")
+dbLoadRecords("db/procServControl.db", "P=$(IOC2), PORT=port2, NPORT=2001")
+dbLoadRecords("db/procServControl.db", "P=$(IOC3), PORT=port3, NPORT=2002")
+dbLoadRecords("db/procServControl.db", "P=$(IOC4), PORT=port4, NPORT=2003")
+dbLoadRecords("db/procServControl.db", "P=$(IOC5), PORT=port5, NPORT=2004")
+dbLoadRecords("db/procServControl.db", "P=$(IOC6), PORT=port6, NPORT=2005")
+#dbLoadRecords("db/procServControl.db", "P=$(IOC7), PORT=port7, NPORT=2006")
+dbLoadRecords("db/procServControl.db", "P=$(IOC8), PORT=port8, NPORT=2007")
+############################################################################
+# Start EPICS IOC
+cd $(STARTUP)
+iocInit
+############################################################################
+# Write all PV names to local text file.
+dbl > records.txt
+############################################################################
+# startup SNL program procServControl.st for each IOC.
+seq (&procServControl,"P=$(IOC1)")
+seq (&procServControl,"P=$(IOC2)")
+seq (&procServControl,"P=$(IOC3)")
+seq (&procServControl,"P=$(IOC4)")
+seq (&procServControl,"P=$(IOC5)")
+seq (&procServControl,"P=$(IOC6)")
+#seq (&procServControl,"P=$(IOC7)")
+seq (&procServControl,"P=$(IOC8)")
+############################################################################
+# print the time our boot was finished
+date
+############################################################################
