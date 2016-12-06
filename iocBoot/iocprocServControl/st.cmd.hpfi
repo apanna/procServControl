@@ -3,7 +3,7 @@
 
 # For deviocstats
 epicsEnvSet("ENGINEER", "Alireza Panna")
-epicsEnvSet("LOCATION", "B1D521D DT-SMLIN112")
+epicsEnvSet("LOCATION", "B1D521D DT-IMBLIN113")
 epicsEnvSet("STARTUP","$(TOP)/iocBoot/$(IOC)")
 epicsEnvSet("ST_CMD","st.cmd.hpfi")
 
@@ -14,8 +14,10 @@ epicsEnvSet "IOC3" "$(IOC3=HPFI:KOHZU)"
 epicsEnvSet "IOC4" "$(IOC4=HPFI:NEWPORT)"
 epicsEnvSet "IOC5" "$(IOC5=HPFI)"
 epicsEnvSet "IOC6" "$(IOC6=HPFI:Qi2)"
-#epicsEnvSet "IOC7" "$(IOC7=HPFI:TL)"
+epicsEnvSet "IOC7" "$(IOC7=HPFI:TL)"
 epicsEnvSet "IOC8" "$(IOC8=HPFI:cpiSync)"
+epicsEnvSet "IOC9" "$(IOC9=HPFI:OXFORD:xray)"
+epicsEnvSet "IOC10" "$(IOC10=HPFI:NikonKsSync)"
 ############################################################################
 # Increase size of buffer for error logging from default 1256
 errlogInit(20000)
@@ -34,6 +36,8 @@ drvAsynIPPortConfigure("port5", "localhost:2004", 100, 0, 0)
 drvAsynIPPortConfigure("port6", "192.168.1.122:2005", 100, 0, 0)
 drvAsynIPPortConfigure("port7", "192.168.1.122:2006", 100, 0, 0)
 drvAsynIPPortConfigure("port8", "192.168.1.122:2007", 100, 0, 0)
+drvAsynIPPortConfigure("port9", "localhost:2008", 100, 0, 0)
+drvAsynIPPortConfigure("port10", "192.168.1.122:2009", 100, 0, 0)
 ############################################################################
 # Load record instances 
 dbLoadRecords("db/procServControl.db", "P=$(IOC1), PORT=port1, NPORT=2000")
@@ -42,8 +46,10 @@ dbLoadRecords("db/procServControl.db", "P=$(IOC3), PORT=port3, NPORT=2002")
 dbLoadRecords("db/procServControl.db", "P=$(IOC4), PORT=port4, NPORT=2003")
 dbLoadRecords("db/procServControl.db", "P=$(IOC5), PORT=port5, NPORT=2004")
 dbLoadRecords("db/procServControl.db", "P=$(IOC6), PORT=port6, NPORT=2005")
-#dbLoadRecords("db/procServControl.db", "P=$(IOC7), PORT=port7, NPORT=2006")
+dbLoadRecords("db/procServControl.db", "P=$(IOC7), PORT=port7, NPORT=2006")
 dbLoadRecords("db/procServControl.db", "P=$(IOC8), PORT=port8, NPORT=2007")
+dbLoadRecords("db/procServControl.db", "P=$(IOC9), PORT=port9, NPORT=2008")
+dbLoadRecords("db/procServControl.db", "P=$(IOC10), PORT=port10, NPORT=2009")
 ############################################################################
 # Start EPICS IOC
 cd $(STARTUP)
@@ -59,8 +65,10 @@ seq (&procServControl,"P=$(IOC3)")
 seq (&procServControl,"P=$(IOC4)")
 seq (&procServControl,"P=$(IOC5)")
 seq (&procServControl,"P=$(IOC6)")
-#seq (&procServControl,"P=$(IOC7)")
+seq (&procServControl,"P=$(IOC7)")
 seq (&procServControl,"P=$(IOC8)")
+seq (&procServControl,"P=$(IOC9)")
+seq (&procServControl,"P=$(IOC10)")
 ############################################################################
 # print the time our boot was finished
 date
