@@ -3,7 +3,6 @@ include $(TOP)/configure/CONFIG
 #=======================================
 
 # Install .dbd and .db files
-DB_INSTALLS += procServControl.db
-#DB_INSTALLS += ipl_expanded.db
+DB += procServControl.db
 #=======================================
 include $(TOP)/configure/RULES
