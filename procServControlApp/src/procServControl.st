@@ -6,6 +6,9 @@ program procServControl("P=P")
  *                             when procServ is stopped.
  *			= 12/12/2015: (AP) Don't use 100% CPU if we try to connect to an 
  *							   invalid portname. Updated code from DLS.
+ *          = 01/06/2017: (AP) pAsynUser needs to be declared as static pointer
+ *                             before assignment. Cannot assign during declaration
+ *                             for some reason.
  ****************************************************************************/ 
 
 %% #include <stdio.h>
@@ -75,6 +78,7 @@ int stateIndex;
 /* C functions and asyn things */
 %% #include <asynOctetSyncIO.h>
 %% static asynUser* pasynUsers[NSTATEMACHINES];
+%% static asynUser* pasynUser;
 %% static void createAsynUser(struct UserVar *pVar);
 %% static void getNextLine(struct UserVar *pVar);
 %% static void writeControlChar(struct UserVar *pVar, const char *controlChar);
@@ -238,7 +242,7 @@ static void getNextLine(struct UserVar *pVar) {
 
     /* Check that asynUser exists */
     if (pVar->stateIndex >= NSTATEMACHINES) return;
-    asynUser *pasynUser = pasynUsers[pVar->stateIndex];
+    pasynUser = pasynUsers[pVar->stateIndex];
     if (pasynUser == NULL) {
         if (pVar->status == INVALIDPORTNAME) {
             /* we can never recover, but at least we won't use all the CPU... */
@@ -370,7 +374,7 @@ static void writeControlChar(struct UserVar *pVar, const char *controlChar) {
 
     /* Check that asynUser exists */
     if (pVar->stateIndex >= NSTATEMACHINES) return;
-    asynUser *pasynUser = pasynUsers[pVar->stateIndex];
+    pasynUser = pasynUsers[pVar->stateIndex];
     if (pasynUser == NULL) return;
 
     /* Check asynUser is connected */
@@ -382,5 +386,3 @@ static void writeControlChar(struct UserVar *pVar, const char *controlChar) {
 }
 
 }%
-
-
