@@ -68,6 +68,11 @@ record(busy, "$(P):RESTART") {
   field(DESC, "Restart IOC")
 }
 
+#% archiver 10 Monitor
+record(busy, "$(P):KILL") {
+  field(DESC, "Kill procServ process")
+}
+
 record(waveform, "$(P):IOCOUT") {
     field(DESC, "Last 20 lines of IOC output")
     field(NELM, "5120")

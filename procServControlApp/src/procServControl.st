@@ -36,29 +36,31 @@ option +r;
 
 /* Inputs */
 string port;            assign port            to "{P}:PORT";
-int showout;            assign showout        to "{P}:SHOWOUT.VAL"; monitor showout;
+int showout;            assign showout         to "{P}:SHOWOUT.VAL"; monitor showout;
 
 /* Outputs */
-string iocname;            assign iocname        to "{P}:IOCNAME";
-int autorestart;        assign autorestart    to "{P}:AUTORESTART";
-int status;                assign status        to "{P}:STATUS";
+string iocname;         assign iocname         to "{P}:IOCNAME";
+int autorestart;        assign autorestart     to "{P}:AUTORESTART";
+int status;             assign status          to "{P}:STATUS";
 #define RUNNING 0
 #define SHUTDOWN 1
 #define PROCSERVSTOPPED 2
 #define INVALIDPORTNAME 3
-char iocout[NELM];        assign iocout        to "{P}:IOCOUT";
+char iocout[NELM];      assign iocout          to "{P}:IOCOUT";
 
 /* Commands */
-int start;                assign start         to "{P}:START";
-int stop;                assign stop         to "{P}:STOP";
+int start;              assign start           to "{P}:START";
+int stop;               assign stop            to "{P}:STOP";
 int restart;            assign restart         to "{P}:RESTART";
-int toggle;                assign toggle         to "{P}:TOGGLE";
+int toggle;             assign toggle          to "{P}:TOGGLE";
+int kill;               assign kill            to "{P}:KILL";
 
 /* Flags */
-monitor start;            evflag startMon;    sync start startMon;
-monitor stop;            evflag stopMon;        sync stop stopMon;
-monitor restart;        evflag restartMon;    sync restart restartMon;
-monitor toggle;            evflag toggleMon;    sync toggle toggleMon;
+monitor start;          evflag startMon;       sync start startMon;
+monitor stop;           evflag stopMon;        sync stop stopMon;
+monitor restart;        evflag restartMon;     sync restart restartMon;
+monitor toggle;         evflag toggleMon;      sync toggle toggleMon;
+monitor kill;           evflag killMon;        sync kill killMon;
 
 /* Internal variables for storing output lines*/
 char iocLine[NLINES][LINELENGTH];
@@ -94,6 +96,7 @@ ss ssUserInput {
             efClear(stopMon);
             efClear(restartMon);
             efClear(toggleMon);
+            efClear(killMon);
         } state MONITORINPUTS
     }
 
@@ -144,6 +147,12 @@ ss ssUserInput {
             }
             toggle = 0;
             pvPut(toggle, SYNC);
+        } state MONITORINPUTS
+        when(efTestAndClear(killMon) && (kill == 1)) {
+            %% writeControlChar(pVar, "\x18");
+            %% writeControlChar(pVar, "\x11");
+            kill = 0;
+            pvPut(kill, SYNC);
         } state MONITORINPUTS
     }
 }
