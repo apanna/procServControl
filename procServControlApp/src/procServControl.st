@@ -4,11 +4,13 @@ program procServControl("P=P")
  *  __log__ = 6/5/2015:   (AP) additional includes to work for windows arch
  *                             Sleep(10) for windows added in polling routine 
  *                             when procServ is stopped.
- *			= 12/12/2015: (AP) Don't use 100% CPU if we try to connect to an 
- *							   invalid portname. Updated code from DLS.
+ *          = 12/12/2015: (AP) Don't use 100% CPU if we try to connect to an 
+ *                             invalid portname. Updated code from DLS.
  *          = 01/06/2017: (AP) pAsynUser needs to be declared as static pointer
  *                             before assignment. Cannot assign during declaration
  *                             for some reason.
+ *          = 01/14/2017: (AP) Add kill method to call ^X+^Q to kill parent procServ
+ *                             process 
  ****************************************************************************/ 
 
 %% #include <stdio.h>
